@@ -1,32 +1,33 @@
 version: '3.3'
 services:
   php:
-    # кастомная сборка
     build:
-      # путь к докерфайлу. отвечающему за сборку
-      context: ./docker/php
-    # если используем просто готовый образ
-    #image: php:8.1-fpm
-    #путь где искать точку входа
+      context: docker/images/php
     volumes:
-      - './:/var/www/html'
+      #- './:/var/www/html'
+      - './www:/var/www'
     links:
       - mysql
   nginx:
     image: nginx
-    # прописываем пути файлов контейнера/машины , подменяя файл энжинкса
     volumes:
-      - './docker/nginx/conf.d:/etc/nginx/conf.d'
+      #- './docker/volumes/nginx/conf.d:/etc/nginx/conf.d'
+      - './hosts:/etc/nginx/conf.d'
+      - './www:/var/www'
+      - './server-logs:/var/log/nginx'
     # передаем порты докер:машина
     ports:
       - 80:80
+      - 443:443
+    links:
+      - php
 
   mysql:
-    # прописываем образ, который пуллить
     image: mysql:5.6
-    # порты бд
-    #- ports:
-     # - "3306:3306"
+    volumes:
+      - './docker/volumes/mysql:/var/lib/mysql'
+    ports:
+      - 3306:3306
 # можно передавать параметры окружения
     environment:
       MYSQL_ROOT_PASSWORD: 'root'
@@ -34,3 +35,7 @@ services:
      #  MYSQL_USER: "app"
      #  MYSQL_PASSWORD: "app"
      #  MYSQL_ROOT_PASSWORD: "test"
+
+  node:
+    build:
+      context: docker/images/nodejs
