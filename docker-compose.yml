@@ -4,16 +4,16 @@ services:
     build:
       context: docker/images/php
     volumes:
-      #- './:/var/www/html'
-      - './www:/var/www'
+      #- './:/var/www/html/html'
+      - './www:/var/www/html'
     links:
       - mysql
   nginx:
     image: nginx
     volumes:
-      #- './docker/volumes/nginx/conf.d:/etc/nginx/conf.d'
-      - './hosts:/etc/nginx/conf.d'
-      - './www:/var/www'
+      - './docker/volumes/nginx/conf.d:/etc/nginx/conf.d'
+      #- './hosts:/etc/nginx/conf.d'
+      - './www:/usr/share/nginx/html'
       - './server-logs:/var/log/nginx'
     # передаем порты докер:машина
     ports:
@@ -21,6 +21,12 @@ services:
       - 443:443
     links:
       - php
+#      - "./www:/home/www:ro"
+#     - "./configs/nginx:/etc/nginx/includes:ro"
+#    - "./configs/nginx.conf:/etc/nginx/nginx.conf:ro"
+#      - "./logs/nginx:/var/log/nginx/:rw"
+#      - "fpmsock:/home/fpm:rw"
+#      - "c2d-www:/var/www/copy2demo:ro"
 
   mysql:
     image: mysql:5.6
